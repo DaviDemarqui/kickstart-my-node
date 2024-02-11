@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
-class Package { // TODO - Vai da merda
+class Package {
   name: string;
   scope: string;
   version: string;
@@ -41,8 +41,15 @@ const DependencySearch = () => {
     }, [search])
 
     const handleSelect = (pckg: Package) => {
-      setSelected(selected => [...selected, pckg]);
-      setShowModal(false);
+      if(selected.length == 0 || !selected.some(x => x == pckg)) {
+        setSelected(selected => [...selected, pckg]);
+        setShowModal(false);
+      }
+    }
+
+    const handleRemove = (pckg: Package) => {
+      const updatedArray = selected.filter(dep => dep != pckg);
+      setSelected(updatedArray);
     }
     
   return (
@@ -57,8 +64,9 @@ const DependencySearch = () => {
           <div className=" rounded-md h-full w-full">
             <ul>              
               {dependencies.map(dep => (
-                <li key={dep} onClick={() => handleSelect(dep)} className='py-3 hover:cursor-pointer my-[5px] border border-slate-400 hover:bg-slate-500'>
-                    <span className='mx-3 my-3 w-full text-white'>{dep.package.name}</span>
+                <li key={dep.package.name} onClick={() => handleSelect(dep)} className='py-3 hover:cursor-pointer my-[5px] border border-slate-400 hover:bg-slate-500'>
+                    <span className='mx-3 my-3 w-full text-green-500 font-bold'>{dep.package.name} - {dep.package.version}</span>
+                    <p className='text-[12px] mx-3 text-slate-100'>{dep.package.description}</p>
                 </li>
               ))}
             </ul>
@@ -69,8 +77,13 @@ const DependencySearch = () => {
             <button onClick={() => setShowModal(true)} className='py-2 w-full bg-transparent border border-white text-white hover:bg-white hover:text-black'>Add Dependency</button>
             <ul>
               {selected.map(selectedDep => (
-                <li key={"selected "+selectedDep} className='py-3 bg-slate-100 hover:cursor-pointer my-[3px]'>
-                    <span className='mx-3 my-3 w-full text-black'>{selectedDep.package.name}</span><button className='float-end mr-3 text-red-500 hover:underline px-4'>Remove</button>
+                <li key={"selected-"+selectedDep.package.name} className='py-3 bg-slate-100 hover:cursor-pointer my-[3px]'>
+                    <span className='mx-3 my-3 w-full text-black'>{selectedDep.package.name}</span> 
+                    <button 
+                      onClick={() => handleRemove(selectedDep)} 
+                      className='float-end mr-3 text-red-600 font-bold hover:underline px-4'>
+                      Remove
+                    </button>
                 </li>
               ))}
             </ul>
